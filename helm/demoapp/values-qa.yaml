@@ -1,0 +1,10 @@
+# QA - deployed automatically from `master` and from `rel.YYYY.MM.DD[-hotfix.N]`.
+#
+# TODO: the QA Kyma subaccount is not provisioned yet. Replace <QA_SHOOT> with the
+# real shoot id once it exists. Until then the deploy job fails its placeholder
+# guard *by design* - build and test still run.
+replicaCount: 1
+image:
+  repository: demoappdeploytokyma-qa
+apirule:
+  host: demoapp-qa.<QA_SHOOT>.kyma.ondemand.com

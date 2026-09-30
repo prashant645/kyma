@@ -1,0 +1,34 @@
+{{- $apiRuleV2 := .Capabilities.APIVersions.Has "gateway.kyma-project.io/v2/APIRule" -}}
+{{- $apiRuleV1beta1 := .Capabilities.APIVersions.Has "gateway.kyma-project.io/v1beta1/APIRule" -}}
+{{- if .Values.apirule.enabled }}
+{{- $host := required "apirule.host must be set for this environment" .Values.apirule.host -}}
+apiVersion: {{ if $apiRuleV1beta1 }}gateway.kyma-project.io/v1beta1{{ else }}gateway.kyma-project.io/v2{{ end }}
+kind: APIRule
+metadata:
+  name: {{ include "demoapp.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "demoapp.labels" . | nindent 4 }}
+spec:
+{{- if $apiRuleV1beta1 }}
+  gateway: {{ printf "%s/%s" .Values.apirule.gatewayNamespace .Values.apirule.gateway }}
+  host: {{ $host }}
+{{- else }}
+  gateway: {{ printf "%s/%s" .Values.apirule.gatewayNamespace .Values.apirule.gateway }}
+  hosts:
+    - {{ $host }}
+{{- end }}
+  service:
+    name: {{ include "demoapp.fullname" . }}
+    port: {{ .Values.service.port }}
+  rules:
+    - path: {{ if $apiRuleV1beta1 }}{{ default "/.*" .Values.apirule.v1beta1Path }}{{ else }}{{ .Values.apirule.path }}{{ end }}
+      methods:
+        {{- toYaml .Values.apirule.methods | nindent 8 }}
+{{- if $apiRuleV1beta1 }}
+      accessStrategies:
+        - handler: allow
+{{- else }}
+      noAuth: {{ .Values.apirule.noAuth }}
+{{- end }}
+{{- end }}

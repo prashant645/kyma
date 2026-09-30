@@ -1,0 +1,17 @@
+# PROD - deployed from `vYYYY.MM.DD[-hotfix.N]` behind the `production`
+# GitHub environment approval gate.
+#
+# TODO: the PROD Kyma subaccount is not provisioned yet. Replace <PROD_SHOOT>
+# with the real shoot id once it exists.
+replicaCount: 2
+image:
+  repository: demoappdeploytokyma-prod
+apirule:
+  host: demoapp.<PROD_SHOOT>.kyma.ondemand.com
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 200m
+    memory: 128Mi
